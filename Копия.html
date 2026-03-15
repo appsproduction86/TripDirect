@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Club</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; color: #333; line-height: 1.6; background-color: #f8fafd;
+        }
+        
+        /* ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА */
+        .lang-switcher {
+            position: absolute; top: 20px; right: 20px; z-index: 100;
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);
+            padding: 5px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.3);
+        }
+        .lang-btn {
+            background: none; border: none; color: white; cursor: pointer;
+            padding: 5px 15px; font-weight: bold; border-radius: 20px; transition: 0.3s;
+        }
+        .lang-btn.active { background: white; color: #1a2a6c; }
+
+        header { 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover; background-position: center;
+            height: 75vh; display: flex; align-items: center; justify-content: center; 
+            text-align: center; color: white; padding: 20px; position: relative;
+        }
+        .container { padding: 40px 20px; max-width: 1000px; margin: auto; }
+        
+        h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); line-height: 1.2; }
+        h2 { text-align: center; font-size: 2.2rem; color: #1a2a6c; margin-bottom: 25px; margin-top: 20px; }
+        
+        .btn-tg { 
+            background: #0088cc; color: white; padding: 20px 45px; text-decoration: none; 
+            border-radius: 50px; font-weight: bold; font-size: 1.3rem; display: inline-block;
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4); transition: 0.3s;
+        }
+        .btn-tg:hover { background: #0077b5; transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 136, 204, 0.5); }
+
+        /* БЛОК: КАК ЭТО РАБОТАЕТ */
+        .steps-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+        .step-item { 
+            background: white; display: flex; align-items: center; padding: 18px 25px; 
+            border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: 0.3s; border-left: 8px solid;
+        }
+        .step-item:hover { transform: translateX(10px); }
+        .step-icon { font-size: 35px; margin-right: 20px; min-width: 50px; text-align: center; }
+        .step-content h3 { margin: 0 0 3px 0; font-size: 1.3rem; color: #1a2a6c; }
+        .step-content p { margin: 0; color: #1a2a6c; font-size: 1rem; opacity: 0.9; }
+
+        .step-red { border-left-color: #e74c3c; }
+        .step-blue { border-left-color: #1a2a6c; }
+        .step-green { border-left-color: #27ae60; }
+        .step-yellow { border-left-color: #f1c40f; }
+
+        /* ТАБЛИЦА */
+        .currency-switcher { text-align: center; margin-bottom: 20px; }
+        select { padding: 10px 20px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; cursor: pointer; }
+        .comparison-table {
+            background: white; border-radius: 25px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); margin: 20px 0; border: 1px solid #e1e8f0;
+        }
+        .comp-header { background: #1a2a6c; color: white; padding: 25px; text-align: center; font-size: 1.3rem; }
+        .comp-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 15px 20px; border-bottom: 1px solid #eee; align-items: center; }
+        .price-old { text-decoration: line-through; color: #999; font-size: 0.95rem; }
+        .price-new { color: #e74c3c; font-weight: bold; font-size: 1.2rem; }
+
+        /* БЛОК ЭКОНОМИИ */
+        .important-highlight { 
+            background: linear-gradient(135deg, #1a2a6c 0%, #2a48ad 100%); 
+            color: white; font-weight: bold; padding: 30px; border-radius: 20px; 
+            text-align: center; font-size: 1.5rem; box-shadow: 0 15px 35px rgba(26, 42, 108, 0.3);
+            border: 3px solid #ffd700; margin: 40px 10px 60px 10px; position: relative; z-index: 10;
+        }
+
+        /* СЕТКА ПРЕИМУЩЕСТВ */
+        .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
+        .benefit-card { 
+            background: #fff; padding: 15px 10px; border-radius: 15px; 
+            text-align: center; border-bottom: 3px solid #1a2a6c; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .benefit-card:hover { transform: translateY(-3px); }
+        .benefit-card span { font-size: 30px; display: block; margin-bottom: 5px; }
+        .benefit-card h3 { font-size: 1rem; color: #1a2a6c; margin: 0 0 5px 0; }
+        .benefit-card p { font-size: 0.85rem; color: #777; line-height: 1.3; margin: 0; }
+
+        @media (max-width: 900px) { .benefits-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) {
+            .benefits-grid { grid-template-columns: 1fr; }
+            .step-item { flex-direction: column; text-align: center; }
+            .step-icon { margin-right: 0; margin-bottom: 15px; }
+            .comp-row { grid-template-columns: 1fr; text-align: center; gap: 5px; }
+            .important-highlight { font-size: 1.1rem; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+    <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+</div>
+
+<header>
+    <div>
+        <h1 id="main-title">Живи по-настоящему.<br>Путешествуй без посредников.</h1>
+        <p id="main-sub" style="font-size: 1.1rem; max-width: 750px; margin: 0 auto 35px; opacity: 0.9; line-height: 1.5;">
+            Мы помогаем планировать идеальные туры напрямую.<br>Никаких турагентств, только свобода и честные цены.
+        </p>
+        <a href="https://t.me/Nov1kov_brand" class="btn-tg tg-btn-text">Начать путешествие ✈️</a>
+    </div>
+</header>
+
+<div class="container">
+    
+    <h2 id="how-title">Как это работает?</h2>
+    <div class="steps-list">
+        <div class="step-item step-red">
+            <div class="step-icon">📲</div>
+            <div class="step-content">
+                <h3 id="step1-t">Регистрация</h3>
+                <p id="step1-p">Вы получите приглашение и активируете личный кабинет в закрытом клубе.</p>
+            </div>
+        </div>
+        <div class="step-item step-blue">
+            <div class="step-icon">✈️</div>
+            <div class="step-content">
+                <h3 id="step2-t">Бронирование</h3>
+                <p id="step2-p">Выбираете отель или тур из 2,000,000+ предложений напрямую.</p>
+            </div>
+        </div>
+        <div class="step-item step-green">
+            <div class="step-icon">💰</div>
+            <div class="step-content">
+                <h3 id="step3-t">Кэшбэк и Экономия</h3>
+                <p id="step3-p">Получаете Travel Credits и оплачиваете ими будущие поездки.</p>
+            </div>
+        </div>
+        <div class="step-item step-yellow">
+            <div class="step-icon">🎁</div>
+            <div class="step-content">
+                <h3 id="step4-t">Партнерская программа</h3>
+                <p id="step4-p">Приглашай друзей, путешествуй бесплатно и зарабатывай на этом.</p>
+            </div>
+        </div>
+    </div>
+
+    <h2 id="why-title">Зачем переплачивать?</h2>
+    <div class="currency-switcher">
+        <label id="curr-label">Валюта: </label>
+        <select id="currency" onchange="updatePrices()">
+            <option value="USD">USD ($)</option>
+            <option value="RUB">RUB (₽)</option>
+        </select>
+    </div>
+
+    <div class="comparison-table" id="hotels-table">
+        <div class="comp-header" id="table-head">Примеры бронирования (7 ночей на двоих)</div>
+        <div class="comp-row" style="background: #f8f9fa; font-weight: bold;">
+            <div id="col1">Направление / Отель</div>
+            <div id="col2">Booking.com</div>
+            <div id="col3">Наш клуб</div>
+        </div>
+    </div>
+
+    <div class="important-highlight" id="economy-text">
+        ⭐ Ваша экономия составит от 30% до 100% за каждую поездку!
+    </div>
+
+    <h2 id="benefits-title">Наши преимущества</h2>
+    <div class="benefits-grid" id="benefits-container">
+        </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <p id="ready-text" style="color: #1a2a6c; font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;">
+            Готовы путешествовать без посредников?
+        </p>
+        <a href="https://t.me/Nov1kov_brand" class="btn-tg tg-btn-text">Начать путешествие ✈️</a>
+    </div>
+</div>
+
+<script>
+const translations = {
+    ru: {
+        title: "Живи по-настоящему.<br>Путешествуй без посредников.",
+        sub: "Мы помогаем планировать идеальные туры напрямую.<br>Никаких турагентств, только свобода и честные цены.",
+        tgBtn: "Начать путешествие ✈️",
+        howTitle: "Как это работает?",
+        step1t: "Регистрация",
+        step1p: "Вы получите приглашение и активируете личный кабинет в закрытом клубе.",
+        step2t: "Бронирование",
+        step2p: "Выбираете отель или тур из 2,000,000+ предложений напрямую.",
+        step3t: "Кэшбэк и Экономия",
+        step3p: "Получаете Travel Credits и оплачиваете ими будущие поездки.",
+        step4t: "Партнерская программа",
+        step4p: "Приглашай друзей, путешествуй бесплатно и зарабатывай на этом.",
+        whyTitle: "Зачем переплачивать?",
+        currLabel: "Валюта: ",
+        tableHead: "Примеры бронирования (7 ночей на двоих)",
+        col1: "Направление / Отель",
+        col2: "Booking.com",
+        col3: "Наш клуб",
+        economy: "⭐ Ваша экономия составит от 30% до 100% за каждую поездку!",
+        benefitsTitle: "Наши преимущества",
+        ready: "Готовы путешествовать без посредников?",
+        benefits: [
+            { icon: "💎", t: "Лучшая цена", p: "Нашли дешевле? Клуб вернет 150% разницы." },
+            { icon: "🛠", t: "Поддержка 24/7", p: "Личный консьерж в реальном времени." },
+            { icon: "🛍", t: "Lifestyle Mall", p: "Брендовые вещи с огромными скидками." },
+            { icon: "🚢", t: "Круизы и Авиа", p: "Платформа для перелетов и круизов." },
+            { icon: "👥", t: "Семейный доступ", p: "Экономьте всей семьей в одном кабинете." },
+            { icon: "🌟", t: "Loyalty Points", p: "Оплачивайте баллами до 100% стоимости." }
+        ]
+    },
+    en: {
+        title: "Live for Real.<br>Travel Without Middlemen.",
+        sub: "We help you plan perfect trips directly.<br>No travel agencies, just freedom and fair prices.",
+        tgBtn: "Start Journey ✈️",
+        howTitle: "How It Works?",
+        step1t: "Registration",
+        step1p: "You receive an invitation and activate your personal account in the private club.",
+        step2t: "Booking",
+        step2p: "Choose a hotel or tour from 2,000,000+ offers directly.",
+        step3t: "Cashback & Savings",
+        step3p: "Receive Travel Credits and use them for your future trips.",
+        step4t: "Referral Program",
+        step4p: "Invite friends, travel for free, and earn from it.",
+        whyTitle: "Why Overpay?",
+        currLabel: "Currency: ",
+        tableHead: "Booking Examples (7 nights for two)",
+        col1: "Destination / Hotel",
+        col2: "Booking.com",
+        col3: "Our Club",
+        economy: "⭐ Your savings will be from 30% to 100% per trip!",
+        benefitsTitle: "Our Advantages",
+        ready: "Ready to travel without middlemen?",
+        benefits: [
+            { icon: "💎", t: "Best Price", p: "Found cheaper? The club will refund 150% of the difference." },
+            { icon: "🛠", t: "24/7 Support", p: "Personal concierge in real-time." },
+            { icon: "🛍", t: "Lifestyle Mall", p: "Branded items with huge discounts." },
+            { icon: "🚢", t: "Cruises & Flights", p: "Platform for flights and cruises." },
+            { icon: "👥", t: "Family Access", p: "Save with your whole family in one account." },
+            { icon: "🌟", t: "Loyalty Points", p: "Pay up to 100% of the cost with points." }
+        ]
+    }
+};
+
+let currentLang = 'ru';
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`button[onclick="setLanguage('${lang}')"]`).classList.add('active');
+    
+    const t = translations[lang];
+    document.getElementById('main-title').innerHTML = t.title;
+    document.getElementById('main-sub').innerHTML = t.sub;
+    document.querySelectorAll('.tg-btn-text').forEach(btn => btn.innerText = t.tgBtn);
+    document.getElementById('how-title').innerText = t.howTitle;
+    document.getElementById('step1-t').innerText = t.step1t;
+    document.getElementById('step1-p').innerText = t.step1p;
+    document.getElementById('step2-t').innerText = t.step2t;
+    document.getElementById('step2-p').innerText = t.step2p;
+    document.getElementById('step3-t').innerText = t.step3t;
+    document.getElementById('step3-p').innerText = t.step3p;
+    document.getElementById('step4-t').innerText = t.step4t;
+    document.getElementById('step4-p').innerText = t.step4p;
+    document.getElementById('why-title').innerText = t.whyTitle;
+    document.getElementById('curr-label').innerText = t.currLabel;
+    document.getElementById('table-head').innerText = t.tableHead;
+    document.getElementById('col1').innerText = t.col1;
+    document.getElementById('col2').innerText = t.col2;
+    document.getElementById('col3').innerText = t.col3;
+    document.getElementById('economy-text').innerText = t.economy;
+    document.getElementById('benefits-title').innerText = t.benefitsTitle;
+    document.getElementById('ready-text').innerText = t.ready;
+
+    const benefitsCont = document.getElementById('benefits-container');
+    benefitsCont.innerHTML = '';
+    t.benefits.forEach(b => {
+        benefitsCont.innerHTML += `<div class="benefit-card"><span>${b.icon}</span><h3>${b.t}</h3><p>${b.p}</p></div>`;
+    });
+
+    updatePrices();
+}
+
+const hotels = [
+    { ru: "Египет: Rixos Premium", en: "Egypt: Rixos Premium", price: 2100 },
+    { ru: "Турция: Alva Donna", en: "Turkey: Alva Donna", price: 1650 },
+    { ru: "Грузия: Sheraton Batumi", en: "Georgia: Sheraton Batumi", price: 1100 },
+    { ru: "Пхукет: Marina Gallery", en: "Phuket: Marina Gallery", price: 950 },
+    { ru: "Бали: Ayana Resort", en: "Bali: Ayana Resort", price: 2900 }
+];
+
+const rubRate = 92.5;
+
+function updatePrices() {
+    const currency = document.getElementById('currency').value;
+    const table = document.getElementById('hotels-table');
+    const rows = table.querySelectorAll('.comp-row');
+    rows.forEach((row, index) => { if(index > 0) row.remove(); });
+
+    hotels.forEach(hotel => {
+        let bookingPrice = hotel.price;
+        let clubPrice = Math.round(hotel.price * 0.65);
+        let symbol = currency === 'RUB' ? "₽" : "$";
+        
+        if(currency === 'RUB') {
+            bookingPrice = Math.round(bookingPrice * rubRate);
+            clubPrice = Math.round(clubPrice * rubRate);
+        }
+
+        const row = document.createElement('div');
+        row.className = 'comp-row';
+        row.innerHTML = `<div><b>${hotel[currentLang]}</b></div><div class="price-old">${bookingPrice.toLocaleString()} ${symbol}</div><div class="price-new">${clubPrice.toLocaleString()} ${symbol}</div>`;
+        table.appendChild(row);
+    });
+}
+
+// Инициализация
+setLanguage('ru');
+</script>
+
+</body>
+</html>
