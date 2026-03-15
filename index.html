@@ -276,7 +276,7 @@ function setLanguage(lang) {
     document.getElementById('table-head').innerText = t.tableHead;
     document.getElementById('col1').innerText = t.col1;
     document.getElementById('col2').innerText = t.col2;
-    document.getElementById('col3').innerText = t.col3;
+    document.getElementById('col3').innerHTML = `<span style="color: #e74c3c;">${t.col3}</span>`;
     document.getElementById('economy-text').innerText = t.economy;
     document.getElementById('benefits-title').innerText = t.benefitsTitle;
     document.getElementById('ready-text').innerText = t.ready;
